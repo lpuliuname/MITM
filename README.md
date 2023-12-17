@@ -2,7 +2,7 @@
 
 ## Tutorials
 
-Tutorials are divided in four sections: beginner, intermediate, advanced and examples. 
+Tutorials are divided in four sections: beginner, intermediate, advanced and examples. The order the tutorials are written in are examples > advanced >>> beginner > intermediate; so if you came here and there are no beginner/intermediate tutorials then it means I haven't gotten to it yet.
 
 ### Beginner
 
