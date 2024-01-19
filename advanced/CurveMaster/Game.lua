@@ -10,7 +10,6 @@ function Game:new()
     level = 1
     camera = fg.Camera({x = 240, y = 180, target = {x = 240, y = 180}})
 
-    
     ball_trails = {}
     paddle_trails = {}
     balls = {}
@@ -70,6 +69,7 @@ function Game:draw()
         love.graphics.draw(particle, 0, 0)
     end
     camera:detach()
+    love.graphics.print("LEVEL: " .. level, 30, 30, 0, 4, 4)
 end
 
 return Game
