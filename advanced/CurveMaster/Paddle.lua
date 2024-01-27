@@ -29,7 +29,7 @@ end
 
 function Paddle:update(dt)
     if self.ai then
-        self.max_v = 175*level
+        self.max_v = 100*level
         local dy = self.y - balls[1].y
         if self.idle then 
             dy = self.y - self.idle_position 
