@@ -87,7 +87,6 @@ fg.screen_width = fg.min_width
 fg.screen_height = fg.min_height
 fg.screen_scale = 1
 
--- init
 fg.init = function()
     love.graphics.setDefaultFilter('nearest', 'nearest')
     fg.screen_width = fg.min_width

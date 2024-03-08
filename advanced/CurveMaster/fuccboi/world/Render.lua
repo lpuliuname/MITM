@@ -68,6 +68,7 @@ function Render:renderUpdate(dt)
 end
 
 function Render:renderResize(w, h)
+    for _, layer in ipairs(self.layers) do layer:resize(w, h) end
     self.camera:resize(w, h)
 end
 

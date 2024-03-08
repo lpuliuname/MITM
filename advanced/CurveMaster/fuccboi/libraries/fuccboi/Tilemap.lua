@@ -228,7 +228,7 @@ function Tilemap:autoTile(auto_tile_rules, extended_rules)
         for i, v in ipairs(self.auto_tile_rules) do
             if v == value then table.insert(results, i) end
         end
-        return results[math.random(1, #results)] or 0
+        return results[math.random(1, math.max(1, #results))] or 0
     end
 
     -- Set grid values based on auto tiles rules and the temporary bitmask values grid

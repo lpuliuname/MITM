@@ -230,9 +230,11 @@ function Camera:updateFollow(dt)
 end
 
 function Camera:resize(w, h)
+    --[[
     if self.target then
         self:moveTo(self.target.x, self.target.y)
     else self:moveTo(w/2, h/2) end
+    ]]--
 end
 
 function Camera:update(dt)
