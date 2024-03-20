@@ -4,6 +4,7 @@ local Entity = Class:extend('Entity')
 function Entity:new(area, x, y, settings)
     self.dead = false
     self.area = area 
+    self.fg = area.fg
     self.id = self.area.fg.getUID()
     self.pool_active = false
     self.x = x
