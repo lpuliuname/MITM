@@ -68,13 +68,12 @@ end
 function Timer:every(delay, func, count)
 	local count, handle = count or math.huge -- exploit below: math.huge - 1 = math.huge
 
-    local actual_delay = delay
-    if type(delay) == 'table' then actual_delay = utils.math.random(delay[1], delay[2]) end
-
-	handle = self:after(actual_delay, function(f)
+	handle = self:after(delay, function(f)
 		if func(func) == false then return end
 		count = count - 1
 		if count > 0 then
+            local actual_delay = delay
+            if type(delay) == 'table' then actual_delay = utils.math.random(delay[1], delay[2]) end
 			self.functions[handle] = actual_delay
 		end
 	end)
