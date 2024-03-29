@@ -9,7 +9,7 @@
 
 local socket = require "socket"
 
-local lovebird = { _version = "0.2.1" }
+local lovebird = { _version = "0.3.0" }
 
 lovebird.loadstring = loadstring or load
 lovebird.inited = false
@@ -21,6 +21,7 @@ lovebird.pages = {}
 lovebird.wrapprint = true
 lovebird.timestamp = true
 lovebird.allowhtml = false
+lovebird.echoinput = true
 lovebird.port = 8000
 lovebird.whitelist = { "127.0.0.1", "192.168.*.*" }
 lovebird.maxlines = 200
@@ -32,6 +33,9 @@ lovebird.pages["index"] = [[
 -- Handle console input
 if req.parsedbody.input then
   local str = req.parsedbody.input
+  if lovebird.echoinput then
+    lovebird.pushline({ type = 'input', str = str })
+  end
   xpcall(function() assert(lovebird.loadstring(str, "input"))() end,
          lovebird.onerror)
 end
@@ -64,9 +68,21 @@ end
       text-align: center;
       padding-left: 4px;
       padding-right: 4px;
-      padding-top: 1px;
-      padding-bottom: 1px;
-      border-radius: 6px;
+      padding-top: 0px;
+      padding-bottom: 0px;
+      border-radius: 7px;
+      display: inline-block;
+    }
+    .errormarker {
+      color: #F0F0F0;
+      background: #8E0000;
+      font-size: 11px;
+      font-weight: bold;
+      text-align: center;
+      border-radius: 8px;
+      width: 17px;
+      padding-top: 0px;
+      padding-bottom: 0px;
       display: inline-block;
     }
     .greybordered {
@@ -74,6 +90,18 @@ end
       background: #F0F0F0;
       border: 1px solid #E0E0E0;
       border-radius: 3px;
+    }
+    .inputline {
+      font-family: mono, courier;
+      font-size: 13px;
+      color: #606060;
+    }
+    .inputline:before {
+      content: '\00B7\00B7\00B7';
+      padding-right: 5px;
+    }
+    .errorline {
+      color: #8E0000;
     }
     #header {
       background: #101010;
@@ -125,11 +153,14 @@ end
     }
     #inputbox {
       width: 100%;
+      font-family: mono, courier;
+      font-size: 13px;
     }
     #output {
       overflow-y: scroll;
       position: absolute;
       margin: 10px;
+      line-height: 17px;
       top: 0px; bottom: 36px; left: 0px; right: 0px;
     }
     #env {
@@ -176,6 +207,16 @@ end
     </div>
     <script>
       document.getElementById("inputbox").focus();
+
+      var changeFavicon = function(href) {
+        var old = document.getElementById("favicon");
+        if (old) document.head.removeChild(old);
+        var link = document.createElement("link");
+        link.id = "favicon";
+        link.rel = "shortcut icon";
+        link.href = href;
+        document.head.appendChild(link);
+      }
 
       var truncate = function(str, len) {
         if (str.length <= len) return str;
@@ -250,9 +291,24 @@ end
             var div = document.getElementById("output"); 
             div.scrollTop = div.scrollHeight;
           }
+          /* Update favicon */
+          changeFavicon("data:image/png;base64," + 
+"iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAMAAAAoLQ9TAAAAP1BMVEUAAAAAAAAAAAD////19fUO"+
+"Dg7v7+/h4eGzs7MlJSUeHh7n5+fY2NjJycnGxsa3t7eioqKfn5+QkJCHh4d+fn7zU+b5AAAAAnRS"+
+"TlPlAFWaypEAAABRSURBVBjTfc9HDoAwDERRQ+w0ern/WQkZaUBC4e/mrWzppH9VJjbjZg1Ii2rM"+
+"DyR1JZ8J0dVWggIGggcEwgbYCRbuPRqgyjHNpzUP+39GPu9fgloC5L9DO0sAAAAASUVORK5CYII="
+          );
         },
         function(text) {
           updateDivContent("status", "disconnected &#9675;");
+          /* Update favicon */
+          changeFavicon("data:image/png;base64," + 
+"iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAMAAAAoLQ9TAAAAYFBMVEUAAAAAAAAAAADZ2dm4uLgM"+
+"DAz29vbz8/Pv7+/h4eHIyMiwsLBtbW0lJSUeHh4QEBDn5+fS0tLDw8O0tLSioqKfn5+QkJCHh4d+"+
+"fn5ycnJmZmZgYGBXV1dLS0tFRUUGBgZ0He44AAAAAnRSTlPlAFWaypEAAABeSURBVBjTfY9HDoAw"+
+"DAQD6Z3ey/9/iXMxkVDYw0g7F3tJReosUKHnwY4pCM+EtOEVXrb7wVRA0dMbaAcUwiVeDQq1Jp4a"+
+"xUg5kE0ooqZu68Di2Tgbs/DiY/9jyGf+AyFKBAK7KD2TAAAAAElFTkSuQmCC"
+          );
         });
       }
       setInterval(refreshOutput,
@@ -372,6 +428,7 @@ function lovebird.init()
   lovebird.addr, lovebird.port = lovebird.server:getsockname()
   lovebird.server:settimeout(0)
   -- Wrap print
+  lovebird.origprint = print
   if lovebird.wrapprint then
     local oldprint = print
     print = function(...)
@@ -475,6 +532,44 @@ function lovebird.clear()
 end
 
 
+function lovebird.pushline(line)
+  line.time = os.time()
+  line.count = 1
+  table.insert(lovebird.lines, line)
+  if #lovebird.lines > lovebird.maxlines then
+    table.remove(lovebird.lines, 1)
+  end
+  lovebird.recalcbuffer()
+end
+
+
+function lovebird.recalcbuffer()
+  local function doline(line)
+    local str = line.str
+    if not lovebird.allowhtml then
+      str = lovebird.htmlescape(line.str):gsub("\n", "<br>")
+    end
+    if line.type == "input" then
+      str = '<span class="inputline">' .. str .. '</span>'
+    else
+      if line.type == "error" then
+        str = '<span class="errormarker">!</span> ' .. str
+        str = '<span class="errorline">' .. str .. '</span>'
+      end
+      if line.count > 1 then
+        str = '<span class="repeatcount">' .. line.count .. '</span> ' .. str
+      end
+      if lovebird.timestamp then
+        str = os.date('<span class="timestamp">%H:%M:%S</span> ', line.time) .. 
+              str
+      end
+    end
+    return str
+  end
+  lovebird.buffer = table.concat(lovebird.map(lovebird.lines, doline), "<br>")
+end
+
+
 function lovebird.print(...)
   local t = {}
   for i = 1, select("#", ...) do
@@ -486,35 +581,19 @@ function lovebird.print(...)
     -- Update last line if this line is a duplicate of it
     last.time = os.time()
     last.count = last.count + 1
+    lovebird.recalcbuffer()
   else
     -- Create new line
-    local line = { str = str, time = os.time(), count = 1 }
-    table.insert(lovebird.lines, line)
-    if #lovebird.lines > lovebird.maxlines then
-      table.remove(lovebird.lines, 1)
-    end
+    lovebird.pushline({ type = "output", str = str })
   end
-  -- Build string buffer from lines
-  local function doline(line)
-    local str = line.str
-    if not lovebird.allowhtml then
-      str = lovebird.htmlescape(line.str):gsub("\n", "<br>")
-    end
-    if line.count > 1 then
-      str = '<span class="repeatcount">' .. line.count .. '</span> ' .. str
-    end
-    if lovebird.timestamp then
-      str = os.date('<span class="timestamp">%H:%M:%S</span> ', line.time) .. 
-            str
-    end
-    return str
-  end
-  lovebird.buffer = table.concat(lovebird.map(lovebird.lines, doline), "<br>")
 end
 
 
 function lovebird.onerror(err)
-  lovebird.trace("ERROR:", err)
+  lovebird.pushline({ type = "error", str = err })
+  if lovebird.wrapprint then
+    lovebird.origprint("[lovebird] ERROR: " .. err)
+  end
 end
 
 

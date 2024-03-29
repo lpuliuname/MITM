@@ -1,7 +1,7 @@
 # lovebird
 A browser-based debug console for the [LÖVE](http://love2d.org) framework.
 
-![screenshot from 2014-04-16 19 53 57](https://cloud.githubusercontent.com/assets/3920290/2723790/d132d90c-c598-11e3-8ec8-a7184f0c1be9.png)
+![screenshot from 2014-06-28 14 52 34](https://cloud.githubusercontent.com/assets/3920290/3420901/c15975ce-fecb-11e3-9517-970c919815b4.png)
 
 
 ## Usage
@@ -40,6 +40,10 @@ accepted. The default is `{ "127.0.0.1", "192.168.*.*" }`.
 Whether lovebird should wrap the `print()` function or not. If this is true
 then all the calls to print will also be output to lovebird's console. This is
 `true` by default.
+
+### lovebird.echoinput
+Whether lovebird should display inputted commands in the console's output
+buffer; `true` by default.
 
 ### lovebird.maxlines
 The maximum number of lines lovebird should store in its console's output
