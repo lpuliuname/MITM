@@ -72,6 +72,9 @@ fg.Collision = require (fuccboi_path .. '/libraries/fuccboi/Collision')(fg)
 -- utils
 fg.utils = require (fuccboi_path .. '/libraries/fuccboi/utils')
 
+-- debugDraw drawing
+fg.debugDraw = require (fuccboi_path .. '/libraries/fuccboi/debugDraw')
+
 fg.getUID = function()
     fg.uid = fg.uid + 1
     return fg.uid
@@ -79,7 +82,6 @@ end
 
 fg.uid = 0
 fg.path = nil
-fg.debug_draw = true
 fg.lovebird_enabled = false
 fg.min_width = 480
 fg.min_height = 360
@@ -200,11 +202,13 @@ fg.update = function(dt)
     for k, s in pairs(fg.Spritebatches) do s:update(dt) end
     fg.timer:update(dt)
     fg.world:update(dt)
+    fg.debugDraw.update(dt)
 end
 
 fg.draw = function()
     fg.world:draw()
     fg.loveframes.draw()
+    fg.debugDraw.draw()
 end
 
 fg.run = function()

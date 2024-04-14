@@ -141,7 +141,7 @@ end
 
 function PhysicsBody:physicsBodyDraw()
     self.x, self.y = self.body:getPosition()
-    if not self.area.fg.debug_draw then return end
+    if not self.area.fg.debugDraw.physics_enabled then return end
 
     for name, body in pairs(self.bodies) do
         if self.shapes[name]:type() == 'PolygonShape' then
