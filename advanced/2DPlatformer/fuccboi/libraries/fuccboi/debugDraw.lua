@@ -4,7 +4,8 @@ local path = fuccboi_path .. '/resources/controllers/'
 debugDraw.input = fg.input
 debugDraw.controller_enabled = false 
 debugDraw.keyboard_enabled = false 
-debugDraw.physics_enabled = false
+debugDraw.physics_enabled = true 
+debugDraw.query_enabled = false
 
 debugDraw.resources = {}
 debugDraw.resources.PS3 = {
@@ -129,7 +130,6 @@ debugDraw.draw = function()
         if v > 0.5 then visual = debugDraw.resources.PS3.r2_down end
         love.graphics.draw(visual, fg.screen_width, fg.screen_height, 0, 0.5, 0.5, debugDraw.positions.PS3.r2.x, debugDraw.positions.PS3.r2.y)
     end
-
 end
 
 return debugDraw

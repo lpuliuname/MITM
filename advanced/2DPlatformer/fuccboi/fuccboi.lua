@@ -116,6 +116,8 @@ fg.World = require (fuccboi_path .. '/world/World')
 -- entity
 fg.Background = require (fuccboi_path .. '/entities/Background') 
 fg.Entity = require (fuccboi_path .. '/entities/Entity')
+fg.DebugShape = require (fuccboi_path .. '/entities/DebugShape')
+fg.classes['DebugShape'] = fg.DebugShape
 fg.Solid = require (fuccboi_path .. '/entities/Solid')
 fg.classes['Solid'] = fg.Solid
 fg.Spritebatch = require (fuccboi_path .. '/entities/Spritebatch')

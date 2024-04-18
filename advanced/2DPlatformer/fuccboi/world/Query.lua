@@ -58,6 +58,9 @@ function Query:getEntitiesWhere(condition, object_types)
 end
 
 function Query:queryClosestAreaCircle(ids, x, y, radius, object_types)
+    if self.fg.debugDraw.query_enabled then
+        self:createEntity('DebugShape', x, y, {r = radius, shape = 'circle', query = true})
+    end
     local out_object = nil
     local min_distance = 100000
     for _, type in ipairs(object_types) do
@@ -77,10 +80,17 @@ function Query:queryClosestAreaCircle(ids, x, y, radius, object_types)
             end
         end
     end
+    if out_object and self.fg.debugDraw.query_enabled then
+        self:createEntity('DebugShape', x, y, 
+                         {xf = out_object.x, yf = out_object.y, shape = 'line', link = true})
+    end
     return out_object
 end
 
 function Query:queryAreaCircle(x, y, radius, object_types)
+    if self.fg.debugDraw.query_enabled then
+        self:createEntity('DebugShape', x, y, {r = radius, shape = 'circle', query = true})
+    end
     local objects = {}
     for _, type in ipairs(object_types) do
         for _, group in ipairs(self.groups) do

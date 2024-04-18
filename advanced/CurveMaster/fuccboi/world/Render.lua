@@ -11,8 +11,9 @@ function Render:renderNew()
 
     self.layers = {}
     self.sortable_layers = {}
-    self.layers_order = {'Default'}
+    self.layers_order = {'Default', 'Debug'}
     self:addLayer('Default')
+    self:addLayer('Debug')
 end
 
 function Render:setLayerOrder(layers_order)
