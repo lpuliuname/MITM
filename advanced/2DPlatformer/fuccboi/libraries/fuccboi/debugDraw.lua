@@ -4,8 +4,8 @@ local path = fuccboi_path .. '/resources/controllers/'
 debugDraw.input = fg.input
 debugDraw.controller_enabled = false 
 debugDraw.keyboard_enabled = false 
-debugDraw.physics_enabled = true 
-debugDraw.query_enabled = false
+debugDraw.physics_enabled = false 
+debugDraw.query_enabled = false 
 
 debugDraw.resources = {}
 debugDraw.resources.PS3 = {

@@ -144,7 +144,7 @@ end
 -- Miscellaneous
 utils.angleToDirection2 = function(angle)
     angle = math.abs(angle)
-    if angle < math.pi/2 and angle >= 3*math.pi/2 then return 'right' end
+    if angle < math.pi/2 or angle >= 3*math.pi/2 then return 'right' end
     if angle >= math.pi/2 and angle < 3*math.pi/2 then return 'left' end
 end
 

@@ -30,6 +30,7 @@ fg.mlib = require (fuccboi_path .. '/libraries/mlib/mlib')
 fg.Assets = {}
 fg.Loader = require (fuccboi_path .. '/libraries/love-loader/love-loader')
 fg.lovebird = require (fuccboi_path .. '/libraries/lovebird/lovebird')
+fg.lurker = require (fuccboi_path .. '/libraries/lurker/lurker')
 require(string.gsub(fuccboi_path, '/', '.') .. '.libraries.loveframes')
 fg.loveframes = loveframes
 
@@ -83,6 +84,7 @@ end
 fg.uid = 0
 fg.path = nil
 fg.lovebird_enabled = false
+fg.lurker_enabled = false
 fg.min_width = 480
 fg.min_height = 360
 fg.screen_width = fg.min_width
@@ -198,6 +200,7 @@ end
 
 fg.update = function(dt)
     fg.Sound.cleanup()
+    if fg.lurker_enabled then fg.lurker.update() end
     if fg.lovebird_enabled then fg.lovebird.update() end
     fg.loveframes.update(dt)
     fg.Collision:generateCategoriesMasks()
