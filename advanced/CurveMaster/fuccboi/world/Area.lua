@@ -54,14 +54,6 @@ function Area:draw()
     
 end
 
-function Area:save()
-    
-end
-
-function Area:load(data)
-    
-end
-
 function Area:activate()
     self.active = true
 end
@@ -73,7 +65,8 @@ end
 function Area:initializePools()
     for class_name, _ in pairs(self.fg.classes) do 
         if self.fg.classes[class_name].pool_enabled then
-            self.pools[class_name] = Pool(self, class_name, self.fg.classes[class_name].pool_enabled, 
+            self.pools[class_name] = Pool(self, class_name, 
+                                          self.fg.classes[class_name].pool_enabled, 
                                           self.fg.classes[class_name].pool_overflow_rule)
         end
     end
@@ -138,7 +131,7 @@ function Area:removeFromGroup(group_name, id)
     end
 end
 
-function Area:destroy()
+function Area:clear()
     for _, group in ipairs(self.groups) do group:apply(function(entity) entity.dead = true end) end
     self.fg.world:renderUpdate(0)
     for i, group in ipairs(self.groups) do 

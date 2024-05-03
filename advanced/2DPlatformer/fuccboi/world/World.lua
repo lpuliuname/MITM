@@ -73,6 +73,13 @@ function World:resize(w, h)
     self:renderResize(w, h)
 end
 
+function World:clear()
+    for _, area in pairs(self.areas) do area:clear() end
+    self.areas = {}
+    self:createArea('Default', 0, 0)
+    self.areas['Default']:activate()
+end
+
 -- mg.world -> mg.world.areas['Default'] redirects
 function World:createEntity(...) self.areas['Default']:createEntity(...) end
 function World:createEntityImmediate(...) return self.areas['Default']:createEntityImmediate(...) end

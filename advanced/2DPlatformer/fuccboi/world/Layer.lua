@@ -54,6 +54,14 @@ function Layer:remove(id)
     end
 end
 
+function Layer:clear()
+    self.entities = {}
+    self.shader_names = {}
+    self.shader_classes = {}
+    self.shaders = {}
+    self.canvases = {}
+end
+
 function Layer:draw()
     self.main_canvas:clear()
 
@@ -68,7 +76,8 @@ function Layer:draw()
                     self.canvases[name]:renderTo(function()
                         self.world:renderAttach()
                         for _, entity in ipairs(self.entities) do 
-                            if utils.table.contains(self.shader_classes[name], entity.class_name) then 
+                            if self.fg.fn.contains(self.shader_classes[name], 
+                               entity.class_name) then 
                                 if entity.area.active then entity:draw() end
                             end
                         end
@@ -77,7 +86,8 @@ function Layer:draw()
                     self.main_canvas:renderTo(function()
                         self.world:renderAttach()
                         for _, entity in ipairs(self.entities) do 
-                            if not utils.table.contains(self.shader_classes[name], entity.class_name) then 
+                            if not self.fg.fn.contains(self.shader_classes[name], 
+                               entity.class_name) then 
                                 if entity.area.active then entity:draw() end
                             end
                         end

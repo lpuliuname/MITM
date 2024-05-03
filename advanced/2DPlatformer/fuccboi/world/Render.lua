@@ -81,6 +81,11 @@ function Render:renderDetach()
     self.camera:detach()
 end
 
+function Render:renderClear()
+    for _, layer in ipairs(self.layers) do layer:clear() end
+    self.layers_order = {'Default', 'Debug'}
+end
+
 function Render:renderDraw()
     self.main_canvas:clear()
     self.main_canvas:renderTo(function()
