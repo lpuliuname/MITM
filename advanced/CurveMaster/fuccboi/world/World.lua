@@ -78,6 +78,7 @@ function World:clear()
     self.areas = {}
     self:createArea('Default', 0, 0)
     self.areas['Default']:activate()
+    self:renderClear()
 end
 
 -- mg.world -> mg.world.areas['Default'] redirects
