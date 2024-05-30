@@ -78,7 +78,9 @@ function Layer:draw()
                         for _, entity in ipairs(self.entities) do 
                             if self.fg.fn.contains(self.shader_classes[name], 
                                entity.class_name) then 
-                                if entity.area.active then entity:draw() end
+                                if entity.area then
+                                    if entity.area.active then entity:draw() end
+                                else entity:draw() end
                             end
                         end
                         self.world:renderDetach()
@@ -88,7 +90,9 @@ function Layer:draw()
                         for _, entity in ipairs(self.entities) do 
                             if not self.fg.fn.contains(self.shader_classes[name], 
                                entity.class_name) then 
-                                if entity.area.active then entity:draw() end
+                                if entity.area then
+                                    if entity.area.active then entity:draw() end
+                                else entity:draw() end
                             end
                         end
                         self.world:renderDetach()
@@ -115,7 +119,9 @@ function Layer:draw()
                     self.canvases[name]:renderTo(function()
                         self.world:renderAttach()
                         for _, entity in ipairs(self.entities) do 
-                            if entity.area.active then entity:draw() end
+                            if entity.area then
+                                if entity.area.active then entity:draw() end
+                            else entity:draw() end
                         end
                         self.world:renderDetach()
                     end)

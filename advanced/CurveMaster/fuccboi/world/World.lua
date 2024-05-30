@@ -98,8 +98,6 @@ function World:applyAreaPolygon(...) self.areas['Default']:applyAreaPolygon(...)
 function World:createTiledMapEntities(...) self.areas['Default']:createTiledMapEntities(...) end
 function World:generateCollisionSolids(...) self.areas['Default']:generateCollisionSolids(...) end
 function World:spawnParticles(...) self.areas['Default']:spawnParticles(...) end
-function World:save(...) self.areas['Default']:save(...) end
-function World:load(...) self.areas['Default']:load(...) end
 function World:activate(...) self.areas['Default']:activate(...) end
 function World:deactivate(...) self.areas['Default']:deactivate(...) end
 
