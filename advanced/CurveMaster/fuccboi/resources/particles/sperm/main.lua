@@ -1,8 +1,9 @@
 require("loveframes")
 
 function love.load()
+	ty = 0
     -- YOUR SAVE FOLDER HERE
-    save_folder = "C:/Users/Waffles/dev/mogamett/tutorials/Pong/mogamett/resources/particles/sperm/"
+    save_folder = "C:/Users/Davis Claiborne/AppData/Roaming/LOVE/01 - TEMP/"
 
     images = {}
     premultiplied_images = {}
@@ -973,7 +974,7 @@ function createParticleFrame(n, name, x, y, w, h)
 end
 
 function love.update(dt)
-    loveframes.update(dt)
+    loveframes.update(dt, ty)
     for _, ps in ipairs(particle_systems) do ps:update(dt) end
     if love.mouse.isDown('l') then
         if love.keyboard.isDown('lctrl') then
@@ -987,7 +988,10 @@ function love.update(dt)
 end
 
 function love.draw()
-    loveframes.draw() 
+	love.graphics.push()
+		love.graphics.translate( 0, ty )
+		loveframes.draw() 
+	love.graphics.pop()
     love.graphics.setBackgroundColor(bg[1], bg[2], bg[3], bg[4])
     love.graphics.setBlendMode(blend_mode)
     for _, ps in ipairs(particle_systems) do love.graphics.draw(ps, 0, 0) end
@@ -996,11 +1000,16 @@ function love.draw()
 end
 
 function love.mousepressed(x, y, button)
-    loveframes.mousepressed(x, y, button)    
+    loveframes.mousepressed(x, y - ty, button)    
+	if button == 'wu' then 
+		ty = ty < 0 and ty + 15 or 0
+	elseif button == 'wd' then
+		ty = ty > -205 and ty - 15 or -205
+	end
 end
 
 function love.mousereleased(x, y, button)
-    loveframes.mousereleased(x, y, button)
+    loveframes.mousereleased(x, y - ty, button)
 end
 
 function love.keypressed(key, unicode)

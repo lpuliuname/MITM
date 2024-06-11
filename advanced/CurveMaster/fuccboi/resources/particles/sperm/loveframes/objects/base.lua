@@ -692,6 +692,7 @@ end
 function newobject:InClickBounds()
 
 	local x, y = love.mouse.getPosition()
+	y = y - ty
 	local bounds = self.clickbounds
 	
 	if bounds then
@@ -734,6 +735,7 @@ function newobject:CheckHover()
 	local width = self.width
 	local height = self.height
 	local mx, my = love.mouse.getPosition()
+	my = my - ty
 	local selfcol = loveframes.util.BoundingBox(mx, x, my, y, 1, width, 1, height)
 	local collisioncount = loveframes.collisioncount
 	local curstate = loveframes.state
