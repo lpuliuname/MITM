@@ -8,6 +8,13 @@ local tableContains = function(t, value)
 end
 
 function Text.new(text, settings)
+	if ( text:find( "%[" ) or text:find( "%(" ) ) or ( text:find( "%]" ) or text:find( "%)" ) ) then
+        if text:find( "%f[^%[](.-)%f[%]]" ) and not text:find( "%f[^%(](.-)%f[%)]" ) then
+            error( "No function defined, either drop the []s or define a function and apply it to the text using ()" ) 
+        end
+        error( "Syntax error: make sure you close \"[]\"." )
+    end
+	
     local self = {}
 
     local settings = settings or {}
@@ -46,17 +53,13 @@ function Text.new(text, settings)
             local k = i+j+1
             modifier.init_modifier_delimiter = k
             -- Look for pairing ')'
-            local loops = 0
             finding_pair = true
             j = 0
-            while finding_pair and loops < 10000 do
-                loops = loops + 1
+            while finding_pair do
                 j = j + 1
                 local d = text:sub(k+j, k+j)
                 if d == ')' then finding_pair = false end -- reached the final pairing ), end loop
             end
-            print(loops)
-            if loops == 10000 then error("No function defined, either drop the []s or define a function and apply it to the text using ()") end
             modifier.end_modifier_delimiter = k+j
             modifier.modifier_text = text:sub(modifier.init_modifier_delimiter+1, modifier.end_modifier_delimiter-1)
             table.insert(m, modifier)
@@ -184,7 +187,6 @@ function Text.new(text, settings)
         end
         print()
     end
-
     for _, w in ipairs(m) do
         print(w.text, w.modifier_text)
         print(w.init_text_delimiter, w.end_text_delimiter, w.init_modifier_delimiter, w.end_modifier_delimiter)
