@@ -59,7 +59,7 @@ function Tilemap.new(x, y, tile_width, tile_height, tilesets, tile_grid, setting
             end
         end
         for _, layer in ipairs(self.tiled_data.layers) do
-            if layer.type == 'tilelayer' then
+            if layer.type == 'tilelayer' and layer.properties.collision ~= "true" then
                 local width, height = layer.width, layer.height
                 for i = 1, height do
                     for j = 1, width do
