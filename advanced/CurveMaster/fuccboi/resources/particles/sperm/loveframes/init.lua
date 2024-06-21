@@ -126,7 +126,7 @@ function loveframes.update(dt)
 		end
 	end
 	
-	if version == "0.9.0" then
+	if version == "0.9.0" or version == "0.9.1" or version == "0.9.2" then
 		local hoverobject = loveframes.hoverobject
 		local arrow = love.mouse.getSystemCursor("arrow")
 		local curcursor = love.mouse.getCursor()
