@@ -77,7 +77,6 @@ function Tilemap:generateCollisionSolids(tilemap)
         local i = 0
         if direction == 'right' or direction == 'left' then
             local w, h = math.floor(tilemap.w/tilemap.tile_width), math.floor(tilemap.h/tilemap.tile_height)
-            local done = false 
             while current_tile == 1 and x+i <= w+1 and x-i >= 0 do
                 if direction == 'right' then
                     current_tile = solid_grid[y][x+i]
@@ -94,7 +93,6 @@ function Tilemap:generateCollisionSolids(tilemap)
 
         elseif direction == 'up' or direction == 'down' then
             local w, h = math.floor(tilemap.w/tilemap.tile_width), math.floor(tilemap.h/tilemap.tile_height)
-            local done = false 
             while current_tile == 1 and y+i <= h+1 and y-i >= 0 do
                 if direction == 'up' then
                     current_tile = solid_grid[y-i][x]
