@@ -310,8 +310,8 @@ function Tilemap:setAutoTileRules(auto_tile_rules, extended_rules)
 end
 
 function Tilemap:setCollisionData(data)
-    for i = 1, #grid do
-        for j = 1, #grid[i] do
+    for i = 1, #data do
+        for j = 1, #data[i] do
             self.solid_grid[i][j] = data[i][j]
         end
     end
