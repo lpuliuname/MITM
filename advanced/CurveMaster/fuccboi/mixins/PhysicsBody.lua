@@ -149,7 +149,7 @@ function PhysicsBody:physicsBodyDraw()
             love.graphics.polygon('line', self.bodies[name]:getWorldPoints(self.shapes[name]:getPoints()))
             love.graphics.setColor(255, 255, 255)
 
-        elseif self.shapes[name]:type() == 'EdgeShape' then
+        elseif self.shapes[name]:type() == 'EdgeShape' or self.shapes[name]:type() == 'ChainShape' then
             love.graphics.setColor(64, 128, 244)
             local points = {self.bodies[name]:getWorldPoints(self.shapes[name]:getPoints())}
             for i = 1, #points, 2 do

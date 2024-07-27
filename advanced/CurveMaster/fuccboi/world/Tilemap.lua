@@ -27,219 +27,230 @@ end
 
 function Tilemap:generateCollisionSolids(tilemap)
     -- New solid_grid copy to be marked over
-    local solid_grid = {}
+    local grid = {}
     for i = 1, #tilemap.solid_grid do
-            solid_grid[i] = {}
+        grid[i] = {}
         for j = 1, #tilemap.solid_grid[i] do
-            solid_grid[i][j] = tilemap.solid_grid[i][j]
+            grid[i][j] = tilemap.solid_grid[i][j]
         end
     end
 
-    -- Returns x, y's neighbors' solid values (1, nil)
-    local getNeighbors = function(x, y)
-        local left, right, up, down = nil, nil, nil, nil
-        local neighbors = {}
-        local w, h = #solid_grid[1], #solid_grid
-        if x > 1 then neighbors.left = solid_grid[y][x-1] end
-        if x < w then neighbors.right = solid_grid[y][x+1] end
-        if y > 1 then neighbors.up = solid_grid[y-1][x] end
-        if y < h then neighbors.down = solid_grid[y+1][x] end
-        return neighbors
-    end
-
-    -- Finds corners from which to start the solidification from
-    local findCorners = function()
-        local corners = {}
-        for i = 1, #solid_grid do
-            for j = 1, #solid_grid[i] do
-                if solid_grid[i][j] == 1 then
-                    local n = getNeighbors(j, i)
-                    for k, v in pairs(n) do if v == 0 or v == 100 then n[k] = nil end end
-                    local direction = nil 
-                    if n.right and n.down and not n.up and not n.left then direction = 'left up' end
-                    if n.left and n.down and not n.up and not n.right then direction = 'right up' end
-                    if n.right and n.up and not n.down and not n.left then direction = 'left down' end
-                    if n.left and n.up and not n.down and not n.right then direction = 'right down' end
-                    if n.left and not n.up and not n.down and not n.right then direction = 'right' end
-                    if n.right and not n.up and not n.down and not n.left then direction = 'left' end
-                    if n.up and not n.right and not n.down and not n.left then direction = 'down' end
-                    if n.down and not n.right and not n.up and not n.left then direction = 'up' end
-                    if direction then table.insert(corners, {x = j, y = i, direction = direction}) end
-                end
-            end
-        end
-        return corners
-    end
-
-    -- From x, y, finds the tile right before the first 0 or nil on a straight horizontal line to the right
-    local findEndTile = function(x, y, direction)
-        local current_tile = solid_grid[y][x]
-        local i = 0
-        if direction == 'right' or direction == 'left' then
-            local w, h = math.floor(tilemap.w/tilemap.tile_width), math.floor(tilemap.h/tilemap.tile_height)
-            while current_tile == 1 and x+i <= w+1 and x-i >= 0 do
-                if direction == 'right' then
-                    current_tile = solid_grid[y][x+i]
-                elseif direction == 'left' then
-                    current_tile = solid_grid[y][x-i]
-                end
-                i = i + 1
-            end
-            if direction == 'right' then 
-                return x+i-2, y
-            elseif direction == 'left' then 
-                return x-i+2, y 
-            end
-
-        elseif direction == 'up' or direction == 'down' then
-            local w, h = math.floor(tilemap.w/tilemap.tile_width), math.floor(tilemap.h/tilemap.tile_height)
-            while current_tile == 1 and y+i <= h+1 and y-i >= 0 do
-                if direction == 'up' then
-                    current_tile = solid_grid[y-i][x]
-                elseif direction == 'down' then
-                    current_tile = solid_grid[y+i][x]
-                end
-                i = i + 1
-            end
-            if direction == 'up' then return x, y-i+2
-            elseif direction == 'down' then return x, y+i-2 end
-        end
-    end
-
-    local getNUnfilled = function()
-        local r = 0
-        for i = 1, #solid_grid do
-            for j = 1, #solid_grid[i] do
-                if solid_grid[i][j] == 1 then
-                    r = r + 1
-                end
-            end
-        end
-        return r
-    end
-
-    -- Finds all corners and fills up rectangles starting from those corners...
-    -- The way the rectangle are filled is not random but doesn't behave as I expected it would,
-    -- meaning it's not optimal rectangle placing
-    local rectangles = {}
-    while #findCorners() > 0 do
-        local corners = findCorners()
-        for _, corner in ipairs(corners) do
-            -- Marked tiles = 100
-            if solid_grid[corner.y][corner.x] ~= 100 then
-
-                local direction = nil
-                if corner.direction == 'left up' then direction = 'right' 
-                elseif corner.direction == 'right up' then direction = 'left' end
-                if corner.direction == 'left down' then direction = 'right'
-                elseif corner.direction == 'right down' then direction = 'left' end
-                if corner.direction == 'left' then direction = 'right'
-                elseif corner.direction == 'right' then direction = 'left' end
-                if corner.direction == 'up' then direction = 'down'
-                elseif corner.direction == 'down' then direction = 'up' end
-
-                -- Fills a rectangle right/left and down
-                if corner.direction == 'left up' or corner.direction == 'right up' then
-                    local x1, y1 = findEndTile(corner.x, corner.y, direction)
-                    local x2, y2 = findEndTile(corner.x, corner.y+1, direction)
-                    local i = 0
-                    local move = (x2 == x1) 
-                    while move and y2 < #solid_grid and solid_grid[corner.y+1+i][corner.x] ~= 100 and solid_grid[corner.y+1+i][corner.x] ~= 0 do
-                        local x_, y_ = findEndTile(corner.x, corner.y+1+i, direction)
-                        if x_ ~= x1 then move = false 
-                        else x2, y2 = x_, y_ end
-                        i = i + 1
-                    end
-
-                    solid_grid[corner.y][corner.x] = 100
-                    local increment = 1
-                    if direction == 'left' then increment = -1 end
-                    if i == 0 then 
-                        for i = corner.x, x1, increment do solid_grid[corner.y][i] = 100 end
-                        table.insert(rectangles, {x1 = corner.x, y1 = corner.y, x2 = x1, y2 = y1})
-                    else 
-                        for i = corner.x, x2, increment do
-                            for j = corner.y, y2, 1 do
-                                solid_grid[j][i] = 100
-                            end
-                        end
-                        table.insert(rectangles, {x1 = corner.x, y1 = corner.y, x2 = x2, y2 = y2})
-                    end
-
-                -- Fills a rectangle right/left and up
-                elseif corner.direction == 'left down' or corner.direction == 'right down' then
-                    local x1, y1 = findEndTile(corner.x, corner.y, direction)
-                    local x2, y2 = findEndTile(corner.x, corner.y-1, direction)
-                    local i = 0
-                    local move = (x2 == x1) 
-                    while move and y2 > 1 and solid_grid[corner.y-1-i][corner.x] ~= 100 and solid_grid[corner.y-1-i][corner.x] ~= 0 do
-                        local x_, y_ = findEndTile(corner.x, corner.y-1-i, direction)
-                        if x_ ~= x1 then move = false
-                        else x2, y2 = x_, y_ end
-                        i = i + 1
-                    end
-
-                    solid_grid[corner.y][corner.x] = 100
-                    local increment = 1
-                    if direction == 'left' then increment = -1 end
-                    if i == 0 then 
-                        for i = corner.x, x1, increment do solid_grid[corner.y][i] = 100 end
-                        table.insert(rectangles, {x1 = corner.x, y1 = corner.y, x2 = x1, y2 = y1})
-                    else 
-                        for i = corner.x, x2, increment do
-                            for j = corner.y, y2, -1 do
-                                solid_grid[j][i] = 100
-                            end
-                        end
-                        table.insert(rectangles, {x1 = corner.x, y1 = corner.y, x2 = x2, y2 = y2})
-                    end
-
-                -- Fills a rectangle left/right
-                elseif corner.direction == 'right' or corner.direction == 'left' then
-                    local x1, y1 = findEndTile(corner.x, corner.y, direction)
-                    solid_grid[corner.y][corner.x] = 100
-                    local increment = 1
-                    if direction == 'left' then increment = -1 end
-                    for i = corner.x, x1, increment do solid_grid[corner.y][i] = 100 end
-                    table.insert(rectangles, {x1 = corner.x, y1 = corner.y, x2 = x1, y2 = y1})
-
-                -- Fills a rectangle up/down
-                elseif corner.direction == 'down' or corner.direction == 'up' then
-                    local x1, y1 = findEndTile(corner.x, corner.y, direction)
-                    solid_grid[corner.y][corner.x] = 100
-                    local increment = 1
-                    if direction == 'up' then increment = -1 end
-                    for i = corner.y, y1, increment do solid_grid[i][corner.x] = 100 end
-                    table.insert(rectangles, {x1 = corner.x, y1 = corner.y, x2 = x1, y2 = y1})
-                end
-            end
-        end
-    end
-
-    while getNUnfilled() > 0 do
-        for i = 1, #solid_grid do
-            for j = 1, #solid_grid[i] do
-                if solid_grid[i][j] == 1 then
-                    solid_grid[i][j] = 100
-                    table.insert(rectangles, {x1 = j, y1 = i, x2 = j, y2 = i})
-                end
-            end
-        end
-    end
-
+    -- Create all edges
+    local edges = {}
     local mx, my = tilemap.tile_width, tilemap.tile_height
-    for _, rectangle in ipairs(rectangles) do
-        local ensure = function(v1, v2)
-            if v1 < v2 then return v1, v2
-            else return v2, v1 end
+    for i = 1, #grid do
+        for j = 1, #grid[i] do
+            if grid[i][j] ~= 0 then
+                local x, y = mx*(j-1) + mx/2, my*(i-1) + my/2
+                local v0 = {x = x - mx/2, y = y + my/2}
+                local v1 = {x = x - mx/2, y = y - my/2}
+                local v2 = {x = x + mx/2, y = y - my/2}
+                local v3 = {x = x + mx/2, y = y + my/2}
+                table.insert(edges, {v0, v1})
+                table.insert(edges, {v1, v2})
+                table.insert(edges, {v2, v3})
+                table.insert(edges, {v3, v0})
+            end
         end
-        local x1, x2 = ensure(rectangle.x1, rectangle.x2)
-        local y1, y2 = ensure(rectangle.y1, rectangle.y2)
-        local w = (tilemap.x + mx*x2 + mx/2) - (tilemap.x + mx*x1 - mx/2)
-        local h = (tilemap.y + my*y2 + my/2) - (tilemap.y + my*y1 - my/2)
-        local x = (tilemap.x + mx*x1 - mx) + w/2
-        local y = (tilemap.y + my*y1 - my) + h/2
-        self:createEntity('Solid', x - tilemap.w/2, y - tilemap.h/2, {body_type = 'static', w = w, h = h})
+    end
+
+    local isEdgeEqual = function(e1, e2)
+        local d1 = (e1[1].x - e2[2].x)*(e1[1].x - e2[2].x) + (e1[1].y - e2[2].y)*(e1[1].y - e2[2].y)
+        local d2 = (e2[1].x - e1[2].x)*(e2[1].x - e1[2].x) + (e2[1].y - e1[2].y)*(e2[1].y - e1[2].y)
+        if d1 < 0.25 and d2 < 0.25 then return true end
+    end
+
+    -- Go through all edges and delete all instances of the ones that appear more than once
+    local marked_for_deletion = {}
+    for i, e1 in ipairs(edges) do
+        for j, e2 in ipairs(edges) do
+            if isEdgeEqual(e1, e2) then
+                table.insert(marked_for_deletion, i)
+                table.insert(marked_for_deletion, j)
+            end
+        end
+    end
+    marked_for_deletion = self.fg.fn.unique(marked_for_deletion)
+    table.sort(marked_for_deletion, function(a, b) return a < b end)
+    for i = #marked_for_deletion, 1, -1 do table.remove(edges, marked_for_deletion[i]) end
+
+    local findEdge = function(edge_list, point)
+        for i, edge in ipairs(edge_list) do
+            local d = (edge[1].x - point.x)*(edge[1].x - point.x) + (edge[1].y - point.y)*(edge[1].y - point.y)
+            if d < 0.25 then return i end
+        end
+    end
+
+    -- Remove extra edges
+    local edge_list_size, last_edge_list_size = #edges, 0
+    while edge_list_size ~= last_edge_list_size do
+        edge_list_size = #edges
+        for _, edge in ipairs(edges) do
+            local p1 = edge[1]
+            local p2 = edge[2]
+            local i = findEdge(edges, edge[2])
+            local p3 = nil
+            if i then 
+                p3 = edges[i][2] 
+                if math.abs((p1.y - p2.y)*(p1.x - p3.x) - (p1.y - p3.y)*(p1.x - p2.x)) <= 0.025 then
+                    edge[2].x, edge[2].y = p3.x, p3.y
+                    table.remove(edges, i)
+                    break
+                end
+            end
+        end
+        last_edge_list_size = #edges
+    end
+
+    -- Tag groups
+    local function edgeTag(tag, edge)
+        edge.tag = tag
+        local next_edge = findEdge(edges, edge[2])
+        while next_edge and not edges[next_edge].tag do
+            edges[next_edge].tag = tag
+            next_edge = findEdge(edges, edges[next_edge][2])
+        end
+    end
+
+    local current_tag = 1
+    for _, edge in ipairs(edges) do
+        if not edge.tag then
+            edgeTag(current_tag, edge)
+            current_tag = current_tag + 1
+        end
+    end
+
+    current_tag = current_tag - 1
+
+    local getTagShape = function(edges, tag)
+        local temp_edges = self.fg.fn.select(self.fg.utils.table.copy(edges), function(key, value) return value.tag == tag end)
+        local vertices = {}
+        local edge = table.remove(temp_edges, 1)
+        table.insert(vertices, edge[1].x)
+        table.insert(vertices, edge[1].y)
+        local next_edge = findEdge(temp_edges, edge[2])
+        while next_edge do
+            edge = table.remove(temp_edges, next_edge)
+            table.insert(vertices, edge[1].x)
+            table.insert(vertices, edge[1].y)
+            next_edge = findEdge(temp_edges, edge[2])
+        end
+        if #temp_edges == 0 then return vertices end
+    end
+
+    -- Figure out which tags are holes
+    local shapes = {}
+    for i = 1, current_tag do shapes[i] = getTagShape(edges, i) end
+
+    local hole_tags = {}
+    for i, s1 in ipairs(shapes) do
+        for j, s2 in ipairs(shapes) do
+            if i ~= j then
+                if self.fg.mlib.polygon.isPolygonInside(s1, s2) then
+                    table.insert(hole_tags, j)
+                end
+            end
+        end
+    end
+    hole_tags = self.fg.fn.unique(hole_tags)
+
+    -- Find zero width points 
+    holes = {}
+    for i, shape in ipairs(shapes) do
+        if self.fg.fn.contains(hole_tags, i) then
+            table.insert(holes, self.fg.utils.table.copy(shape))
+        end
+    end
+
+    not_holes_points = {}
+    for i, shape in ipairs(shapes) do
+        if not self.fg.fn.contains(hole_tags, i) then
+            local not_hole = self.fg.utils.table.copy(shape)
+            for j = 1, #not_hole do table.insert(not_holes_points, not_hole[j]) end
+        end
+    end
+
+    local zero_width_points = {}
+    for _, shape in ipairs(holes) do
+        local min_d, min_i, min_j = 10000, 0, 0
+        for i = 1, #shape, 2 do
+            for j = 1, #not_holes_points, 2 do
+                local d = self.fg.mlib.line.getDistance(shape[i], shape[i+1], not_holes_points[j], not_holes_points[j+1])
+                if d < min_d then min_d = d; min_i = i; min_j = j end
+            end
+        end
+        table.insert(zero_width_points, {x = shape[min_i], y = shape[min_i+1]})
+        table.insert(zero_width_points, {x = not_holes_points[min_j], y = not_holes_points[min_j+1]})
+    end
+
+    -- Make zero width channels
+    local additional_edges = {}
+    for i = 1, #zero_width_points, 2 do
+        local hole_point = zero_width_points[i]
+        local out_point = zero_width_points[i+1]
+        local out_edge = {self.fg.utils.table.copy(hole_point), self.fg.utils.table.copy(out_point)}
+        local in_edge = {self.fg.utils.table.copy(out_point), self.fg.utils.table.copy(hole_point)}
+        table.insert(additional_edges, out_edge)
+        table.insert(additional_edges, in_edge)
+    end
+    for _, edge in ipairs(additional_edges) do table.insert(edges, edge) end
+
+    local findEdges = function(edge_list, point)
+        local edges = {}
+        for i, edge in ipairs(edge_list) do
+            local d = (edge[1].x - point.x)*(edge[1].x - point.x) + (edge[1].y - point.y)*(edge[1].y - point.y)
+            if d < 0.25 then table.insert(edges, i) end
+        end
+        return edges
+    end
+
+    local isPointEqual = function(p1, p2)
+        local d = (p1.x - p2.x)*(p1.x - p2.x) + (p1.y - p2.y)*(p1.y - p2.y)
+        if d < 0.25 then return true end
+    end
+
+    -- Define shape's vertices from edges 
+    local vertices = {}
+    local edge = edges[1]
+    local shape_n = 1
+    local i = 1
+    while #edges > 0 do
+        vertices[shape_n] = {}
+        i = 1
+        local edge, next_edge, ne_ids = nil, nil, nil
+        repeat
+            edge = edges[i]
+            table.insert(vertices[shape_n], edge[1].x)
+            table.insert(vertices[shape_n], edge[1].y)
+            table.remove(edges, i)
+            ne_ids = findEdges(edges, edge[2])
+            local found = false
+            for _, id in ipairs(ne_ids) do
+                if not isPointEqual(edges[id][2], edge[1]) and not edges[id].tag then
+                    i = id
+                    found = true
+                    break
+                end
+            end
+            if not found then
+                for _, id in ipairs(ne_ids) do
+                    if not isPointEqual(edges[id][2], edge[1]) and edges[id].tag then
+                        i = id
+                        break
+                    end
+                end
+            end
+        until #ne_ids <= 0
+        shape_n = shape_n + 1
+    end
+
+    -- Create solids
+    for _, v in ipairs(vertices) do
+        local vs = {}
+        for i = 1, #v do
+            table.insert(vs, v[i])
+        end
+        self:createEntity('Solid', tilemap.x - tilemap.w/2, tilemap.y - tilemap.h/2, {body_type = 'static', shape = 'chain', loop = true, vertices = vs})
     end
 end
 

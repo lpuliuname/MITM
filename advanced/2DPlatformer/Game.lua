@@ -5,7 +5,6 @@ Player = require 'Player'
 function Game:new()
     fg.debugDraw.physics_enabled = true
     fg.world.box2d_world:setGravity(0, 20*32)
-    fg.screen_scale = 2
     fg.setScreenSize(960, 720)
     fg.world:createEntity('Player', fg.screen_width/2, fg.screen_height/2, {w = 16, h = 28})
 

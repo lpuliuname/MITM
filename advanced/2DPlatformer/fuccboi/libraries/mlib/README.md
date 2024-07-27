@@ -1,7 +1,7 @@
 MLib
 ====
 
-__MLib__ is a math and collisions library written in Lua. It's aim is to be __robust__ and __easy to use__. While I've tried to optimize MLib as much as possible, it is still *very* slow, and it is therefore very slow. I am currently working on implementing a more lightweight library, and will link it once it's available. 
+__MLib__ is a math and collisions library written in Lua. It's aim is to be __robust__ and __easy to use__. 
 
 ##Downloading
 You can download the latest __stable__ version of MLib by downloading the latest [release](https://github.com/davisdude/mlib/releases/).
@@ -9,6 +9,21 @@ You can download the latest __working__ version of MLib by downloading the lates
 
 ##Implementing
 To use MLib, simply place [mlib.lua](mlib.lua) inside the desired folder in your project. Then use the `require 'path.to.mlib'` to use any of the functions.
+
+##Examples
+You can see some examples of the code in action [here](https://github.com/davisdude/mlib/tree/master/Examples/). 
+All examples are done using the *awesome* engine of [LÖVE](https://love2d.org/).
+To run them properly, download the [.love file](https://github.com/davisdude/mlib/blob/master/Examples/Shapes.love) and install LÖVE to your computer.
+After that, make sure you set .love files to open with "love.exe".
+For more, see [here](https://love2d.org/).
+
+##When should I use MLib?
+- If you need to know exactly where two objects intersect.
+- If you need general mathematical equations to be done. 
+- If you need very precise details about point intersections. 
+
+##When should I __not__ use MLib?
+- All of the objects in a platformer, or other game, for instance, should not be registered with MLib. Only ones that need very specific information.
 
 ##Specs
 You can find the tests [here](spec.lua).
@@ -21,7 +36,7 @@ tsc -f specs
 - [mlib.line](https://github.com/davisdude/mlib#mlibline)
   - [mlib.line.checkPoint](https://github.com/davisdude/mlib#mliblinecheckpoint)
   - [mlib.line.getClosestPoint](https://github.com/davisdude/mlib#mliblinegetclosestpoint)
-  - [mlib.line.getDistance](https://github.com/davisdude/mlib#mliblinegetlistance)
+  - [mlib.line.getDistance](https://github.com/davisdude/mlib#mliblinegetdistance)
   - [mlib.line.getIntercept](https://github.com/davisdude/mlib#mliblinegetintercept)
   - [mlib.line.getIntersection](https://github.com/davisdude/mlib#mliblinegetintersection)
   - [mlib.line.getLength](https://github.com/davisdude/mlib#mliblinegetlength)
@@ -45,7 +60,7 @@ tsc -f specs
   - [mlib.polygon.getPolygonIntersection](https://github.com/davisdude/mlib#mlibpolygongetpolygonintersection)
   - [mlib.polygon.getSegmentIntersection](https://github.com/davisdude/mlib#mlibpolygongetsegmentintersection)
   - [mlib.polygon.getSignedPolygonArea](https://github.com/davisdude/mlib#mlibpolygongetsignedpolygonarea)
-  - [mlib.polygon.getTriangleHeight](https://github.com/davisdude/mlib#mlibpolygongetriangleheight)
+  - [mlib.polygon.getTriangleHeight](https://github.com/davisdude/mlib#mlibpolygongettriangleheight)
 - [mlib.circle](https://github.com/davisdude/mlib#mlibcircle)
   - [mlib.circle.checkPoint](https://github.com/davisdude/mlib#mlibcirclecheckpoint)
   - [mlib.circle.isPointOnCircle](https://github.com/davisdude/mlib#mlibcircleispointoncircle)
@@ -55,18 +70,23 @@ tsc -f specs
   - [mlib.circle.getLineIntersection](https://github.com/davisdude/mlib#mlibcirclegetlineintersection)
   - [mlib.circle.getSegmentIntersection](https://github.com/davisdude/mlib#mlibcirclegetsegmentintersection)
 - [mlib.statistics](https://github.com/davisdude/mlib#mlibstatistics)
+  - [mlib.statistics.getCentralTendency](https://github.com/davisdude/mlib#mlibstatisticsgetcentraltendency)
+  - [mlib.statistics.getDispersion](https://github.com/davisdude/mlib#mlibstatisticsgetdispersion)
   - [mlib.statistics.getMean](https://github.com/davisdude/mlib#mlibstatisticsgetmean)
   - [mlib.statistics.getMedian](https://github.com/davisdude/mlib#mlibstatisticsgetmedian)
   - [mlib.statistics.getMode](https://github.com/davisdude/mlib#mlibstatisticsgetmode)
   - [mlib.statistics.getRange](https://github.com/davisdude/mlib#mlibstatisticsgetrange)
+  - [mlib.statistics.getStandardDeviation](https://github.com/davisdude/mlib#mlibstatisticsgetstandarddeviation)
+  - [mlib.statistics.getVariance](https://github.com/davisdude/mlib#mlibstatisticsgetvariance)
+  - [mlib.statistics.getVariationRatio](https://github.com/davisdude/mlib#mlibstatisticsgetvariationratio)
 - [mlib.math](https://github.com/davisdude/mlib#mlibmath)
   - [mlib.math.getRoot](https://github.com/davisdude/mlib#mlibmathgetroot)
   - [mlib.math.isPrime](https://github.com/davisdude/mlib#mlibmathisprime)
   - [mlib.math.round](https://github.com/davisdude/mlib#mlibmathround)
   - [mlib.math.getSummation](https://github.com/davisdude/mlib#mlibmathgetsummation)
   - [mlib.math.getPercentOfChange](https://github.com/davisdude/mlib#mlibmathgetpercentofchange)
-  - [mlib.math.getPercenage](https://github.com/davisdude/mlib#mlibmathgetpercentage)
-  - [mlib.math.getQuadraticRoots](https://github.com/davisdude/mlib#mlibmath)
+  - [mlib.math.getPercentage](https://github.com/davisdude/mlib#mlibmathgetpercentage)
+  - [mlib.math.getQuadraticRoots](https://github.com/davisdude/mlib#mlibmathgetquadraticroots)
   - [mlib.math.getAngle](https://github.com/davisdude/mlib#mlibmathgetangle)
   
 ####mlib.line
@@ -529,14 +549,40 @@ end
 ####mlib.statistics
 - Handles statistical aspects of math.
 
+#####mlib.statistics.getCentralTendency
+- Gets the central tendency of the data.
+- Synopses:
+  - `modes, occurrences, median, mean = mlib.statistics.getCentralTendency( data )`
+  - `modes, occurrences, median, mean = mlib.statistics.getCentralTendency( ... )`
+- Arguments: 
+  - `data`: Table. A table containing the values of data.
+  - `...`: Numbers. All of the numbers in the data set.
+- Returns:
+  - `modes, occurrences`: Table, Number. The modes of the data and the number of times it occurs. See [mlib.statistics.getMode](https://github.com/davisdude/mlib#mlibstatisticsgetmode).
+  - `median`: Number. The median of the data set. 
+  - `mean`: Number. The mean of the data set.
+
+#####mlib.statistics.getDispersion
+- Gets the dispersion of the data.
+- Synopses:
+  - `variationRatio, range, standardDeviation = mlib.statistics.getDispersion( data )`
+  - `variationRatio, range, standardDeviation = mlib.statistics.getDispersion( ... )`
+- Arguments: 
+  - `data`: Table. A table containing the values of data.
+  - `...`: Numbers. All of the numbers in the data set.
+- Returns:
+  - `variationRatio`: Number. The variation ratio of the data set.
+  - `range`: Number. The range of the data set.
+  - `standardDeviation`: Number. The standard deviation of the data set.
+
 #####mlib.statistics.getMean
 - Gets the arithmetic mean of the data.
 - Synopses:
   - `mean = mlib.statistics.getMean( data )`
   - `mean = mlib.statistics.getMean( ... )`
 - Arguments: 
-  - `data`: Numbers. The values in the data set. 
-  - `...`: Table. A table containing the values in the data set.
+  - `data`: Table. A table containing the values of data.
+  - `...`: Numbers. All of the numbers in the data set.
 - Returns:
   - `mean`: Number. The arithmetic mean of the data set. 
 
@@ -546,8 +592,8 @@ end
   - `median = mlib.statistics.getMedian( data )`
   - `median = mlib.statistics.getMedian( ... )`
 - Arguments: 
-  - `data`: Numbers. The values in the data set. 
-  - `...`: Table. A table containing the values in the data set.
+  - `data`: Table. A table containing the values of data.
+  - `...`: Numbers. All of the numbers in the data set.
 - Returns: 
   - `median`: Number. The median of the data. 
 
@@ -557,8 +603,8 @@ end
   - `mode, occurrences = mlib.statistics.getMode( data )`
   - `mode, occurrences = mlib.statistics.getMode( ... )`
 - Arguments: 
-  - `data`: Numbers. The values in the data set. 
-  - `...`: Table. A table containing the values in the data set.
+  - `data`: Table. A table containing the values of data.
+  - `...`: Numbers. All of the numbers in the data set.
 - Returns: 
   - `mode`: Table. The mode(s) of the data.
   - `occurrences`: Number. The number of time the mode(s) occur.
@@ -569,10 +615,43 @@ end
   - `range = mlib.statistics.getRange( data )`
   - `range = mlib.statistics.getRange( ... )`
 - Arguments: 
-  - `data`: Numbers. The values in the data set. 
-  - `...`: Table. A table containing the values in the data set.
+  - `data`: Table. A table containing the values of data.
+  - `...`: Numbers. All of the numbers in the data set.
 - Returns: 
   - `range`: Number. The range of the data. 
+
+#####mlib.statistics.getStandardDeviation
+- Gets the standard deviation of the data.
+- Synopses:
+  - `standardDeviation = mlib.statistics.getStandardDeviation( data )`
+  - `standardDeviation = mlib.statistics.getStandardDeviation( ... )`
+- Arguments: 
+  - `data`: Table. A table containing the values of data.
+  - `...`: Numbers. All of the numbers in the data set.
+- Returns:
+  - `standardDeviation`: Number. The standard deviation of the data set. 
+
+#####mlib.statistics.getVariance
+- Gets the variation of the data.
+- Synopses:
+  - `variance = mlib.statistics.getVariance( data )`
+  - `variance = mlib.statistics.getVariance( ... )`
+- Arguments: 
+  - `data`: Table. A table containing the values of data.
+  - `...`: Numbers. All of the numbers in the data set.
+- Returns:
+  - `variance`: Number. The variation of the data set.
+
+#####mlib.statistics.getVariationRatio
+- Gets the variation ratio of the data.
+- Synopses:
+  - `variationRatio = mlib.statistics.getVariationRatio( data )`
+  - `variationRatio = mlib.statistics.getVariationRatio( ... )`
+- Arguments: 
+  - `data`: Table. A table containing the values of data.
+  - `...`: Numbers. All of the numbers in the data set.
+- Returns:
+  - `variationRatio`: Number. The variation ratio of the data set. 
 
 ####mlib.math
 - Miscellaneous functions that have no home. 
@@ -642,7 +721,7 @@ print( a, b ) --> 2, 3
 - Returns: 
   - `change`: Number. The percent of change from `old` to `new`. 
 
-#####mlib.math.getPercenage
+#####mlib.math.getPercentage
 - Gets the percentage of a number. 
 - Synopsis: 
   - `percentage = mlib.math.getPercentage( percent, number )`
@@ -669,3 +748,19 @@ print( a, b ) --> 2, 3
   - `x1`, `y1`: Numbers. The x and y coordinates of the first point. 
   - `x2`, `y2`: Numbers. The x and y coordinates of the vertex of the two points. 
   - `x3`, `y3`: Numbers. The x and y coordinates of the second point. 
+
+##License
+A math library made in Lua
+copyright (C) 2014 Davis Claiborne
+This program is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation; either version 2 of the License, or
+(at your option) any later version.
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+You should have received a copy of the GNU General Public License along
+with this program; if not, write to the Free Software Foundation, Inc.,
+51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
+Contact me at davisclaib at gmail.com

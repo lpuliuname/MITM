@@ -1,3 +1,41 @@
+0.9.2
+====
+Added:
+----
+
+Changed:
+----
+- mlib.polygon.getPolygonIntersection now does not create duplicate local table.
+- mlib.line.getPerpendicularSlope now does not create a global variable.
+- mlib.math.getSummation now allows the error to go through instead of returning false if the stop value is not a number. 
+
+- Changed any instance of the term "userdata" with "input"
+
+Removed:
+----
+
+0.9.1
+====
+Added:
+----
+- Added mlib.statistics.getCentralTendency
+- Added mlib.statistics.getDispersion
+- Added mlib.statistics.getStandardDeviation
+- Added mlib.statistics.getVariation
+- Added mlib.statistics.getVariationRatio
+
+Removed:
+----
+
+Changed:
+----
+- FIX:		mlib.polygon.checkPoint now handles vertices better. 
+
+
+To-Do
+----
+- Add more functions. 
+
 0.9.0
 ====
 Added:
