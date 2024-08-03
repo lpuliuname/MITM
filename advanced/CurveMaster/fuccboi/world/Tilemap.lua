@@ -140,7 +140,9 @@ function Tilemap:generateCollisionSolids(tilemap)
 
     -- Figure out which tags are holes
     local shapes = {}
-    for i = 1, current_tag do shapes[i] = getTagShape(edges, i) end
+    for i = 1, current_tag do 
+        shapes[i] = getTagShape(edges, i)
+    end
 
     local hole_tags = {}
     for i, s1 in ipairs(shapes) do
@@ -158,29 +160,34 @@ function Tilemap:generateCollisionSolids(tilemap)
     holes = {}
     for i, shape in ipairs(shapes) do
         if self.fg.fn.contains(hole_tags, i) then
-            table.insert(holes, self.fg.utils.table.copy(shape))
+            table.insert(holes, {shape = self.fg.utils.table.copy(shape), tag = i})
         end
     end
 
-    not_holes_points = {}
+    all_points = {}
     for i, shape in ipairs(shapes) do
-        if not self.fg.fn.contains(hole_tags, i) then
-            local not_hole = self.fg.utils.table.copy(shape)
-            for j = 1, #not_hole do table.insert(not_holes_points, not_hole[j]) end
-        end
+        local points = self.fg.utils.table.copy(shape)
+        for j = 1, #points do table.insert(all_points, {point = points[j], tag = i}) end
     end
 
     local zero_width_points = {}
     for _, shape in ipairs(holes) do
         local min_d, min_i, min_j = 10000, 0, 0
-        for i = 1, #shape, 2 do
-            for j = 1, #not_holes_points, 2 do
-                local d = self.fg.mlib.line.getDistance(shape[i], shape[i+1], not_holes_points[j], not_holes_points[j+1])
-                if d < min_d then min_d = d; min_i = i; min_j = j end
+        for i = 1, #shape.shape, 2 do
+            for j = 1, #all_points, 2 do
+                if all_points[j].tag ~= shape.tag then
+                    local d = self.fg.mlib.line.getDistance(shape.shape[i], shape.shape[i+1], all_points[j].point, all_points[j+1].point)
+                    if d < min_d then min_d = d; min_i = i; min_j = j end
+                end
             end
         end
-        table.insert(zero_width_points, {x = shape[min_i], y = shape[min_i+1]})
-        table.insert(zero_width_points, {x = not_holes_points[min_j], y = not_holes_points[min_j+1]})
+        table.insert(zero_width_points, {x = shape.shape[min_i], y = shape.shape[min_i+1]})
+        table.insert(zero_width_points, {x = all_points[min_j].point, y = all_points[min_j+1].point})
+    end
+
+    local getTileValue = function(x, y)
+        local i, j = math.floor(y/my)+1, math.floor(x/mx)+1
+        return grid[i][j]
     end
 
     -- Make zero width channels
@@ -188,10 +195,13 @@ function Tilemap:generateCollisionSolids(tilemap)
     for i = 1, #zero_width_points, 2 do
         local hole_point = zero_width_points[i]
         local out_point = zero_width_points[i+1]
-        local out_edge = {self.fg.utils.table.copy(hole_point), self.fg.utils.table.copy(out_point)}
-        local in_edge = {self.fg.utils.table.copy(out_point), self.fg.utils.table.copy(hole_point)}
-        table.insert(additional_edges, out_edge)
-        table.insert(additional_edges, in_edge)
+        local mid_point = {x = (hole_point.x + out_point.x)/2, y = (hole_point.y + out_point.y)/2}
+        if getTileValue(mid_point.x, mid_point.y) ~= 0 then
+            local out_edge = {self.fg.utils.table.copy(hole_point), self.fg.utils.table.copy(out_point)}
+            local in_edge = {self.fg.utils.table.copy(out_point), self.fg.utils.table.copy(hole_point)}
+            table.insert(additional_edges, out_edge)
+            table.insert(additional_edges, in_edge)
+        end
     end
     for _, edge in ipairs(additional_edges) do table.insert(edges, edge) end
 
@@ -247,10 +257,10 @@ function Tilemap:generateCollisionSolids(tilemap)
     -- Create solids
     for _, v in ipairs(vertices) do
         local vs = {}
-        for i = 1, #v do
-            table.insert(vs, v[i])
+        for i = 1, #v do table.insert(vs, v[i]) end
+        if #vs >= 6 then
+            self:createEntity('Solid', tilemap.x - tilemap.w/2, tilemap.y - tilemap.h/2, {body_type = 'static', shape = 'chain', loop = true, vertices = vs})
         end
-        self:createEntity('Solid', tilemap.x - tilemap.w/2, tilemap.y - tilemap.h/2, {body_type = 'static', shape = 'chain', loop = true, vertices = vs})
     end
 end
 
