@@ -111,9 +111,9 @@ end
 
 function Player:onCollisionEnter(other, contact)
     if other.tag == 'Solid' then
-        local solid_top = other.object.y - other.object.h/2
+        local x1, y1, x2, y2 = contact:getPositions()
         local player_bottom = self.y + self.h/2 - 4
-        if solid_top > player_bottom then
+        if y1 > player_bottom then
             self.jumping = false
             self.jumps_left = self.max_jumps
         end
