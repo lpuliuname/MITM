@@ -34,6 +34,16 @@ function Object:implement(...)
         for k, v in pairs(cls) do
             if self[k] == nil and type(v) == "function" then
                 self[k] = v
+                self[k .. '__callbacks'] = {}
+            elseif self[k] and type(v) == "function" then
+                if not k:find('__') then
+                    table.insert(self[k .. '__callbacks'], v)
+                    local f = self[k]
+                    self[k] = function(...)
+                        f(...)
+                        for _, c in ipairs(self[k .. '__callbacks']) do c(...) end
+                    end
+                end
             end
         end
     end

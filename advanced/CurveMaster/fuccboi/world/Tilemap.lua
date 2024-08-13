@@ -20,7 +20,7 @@ function Tilemap:createTiledMapEntities(tilemap)
             settings.visible = object.visible
             for k, v in pairs(object.properties) do settings[k] = v end
             self:createEntity(object.type, object.x + tilemap.x - tilemap.w/2 + object.width/2, 
-                              object.y + tilemap.y - tilemap.w/2 + object.height/2, settings) 
+                              object.y + tilemap.y - tilemap.h/2 + object.height/2, settings) 
         end
     end
 end
