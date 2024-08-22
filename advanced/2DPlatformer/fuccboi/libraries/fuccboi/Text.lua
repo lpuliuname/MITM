@@ -8,13 +8,6 @@ local tableContains = function(t, value)
 end
 
 function Text.new(text, settings)
-	if ( text:find( "%[" ) or text:find( "%(" ) ) or ( text:find( "%]" ) or text:find( "%)" ) ) then
-        if text:find( "%f[^%[](.-)%f[%]]" ) and not text:find( "%f[^%(](.-)%f[%)]" ) then
-            error( "No function defined, either drop the []s or define a function and apply it to the text using ()" ) 
-        end
-        error( "Syntax error: make sure you close \"[]\"." )
-    end
-	
     local self = {}
 
     local settings = settings or {}
