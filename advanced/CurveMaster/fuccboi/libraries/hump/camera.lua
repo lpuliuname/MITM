@@ -311,7 +311,7 @@ function Camera:getWorldCoords(x, y)
 	local w, h = love.graphics.getWidth(), love.graphics.getHeight()
 	local c, s = cos(-self.rotation), sin(-self.rotation)
 	-- x, y = (x - w/2)/self.scale, (y - h/2)/self.scale
-	x, y = x - (w/2)/fg.screen_scale, y - (h/2)/fg.screen_scale
+	x, y = (x - w/2)/fg.screen_scale, (y - h/2)/fg.screen_scale
 	x, y = c*x - s*y, s*x + c*y
 	return x+self.x, y+self.y
 end
