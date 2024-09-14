@@ -41,6 +41,7 @@ function Tilemap.new(x, y, tile_width, tile_height, tilesets, tile_grid, setting
         -- Set tileset images
         self.tilesets = {}
         for _, tileset in ipairs(self.tiled_data.tilesets) do
+            self.padding = tileset.spacing
             -- Image path starts with .., meaning have to substitute .. for 
             -- whatever is the first directory before a / in tiled_map_path
             if tileset.image:sub(1, 2) == '..' then
@@ -289,7 +290,7 @@ function Tilemap:changeTile(x, y, n)
         self.tile_grid[x][y] = n
         self.spritebatches[tileset_index]:set(self.spritebatches_id_grid[tileset_index][x][y], 
                                              self.quads[tileset_index][n], self.tile_width*(y-1) + self.x, 
-                                             self.tile_height*(x-1) + self.y)
+                                             self.tile_height*(x-1) + self.y, 0, 1, 1)
     else
         self.tile_grid[x][y] = n
         self.spritebatches_id_grid[tileset_index][x][y] = self.spritebatches[tileset_index]:add(
@@ -297,10 +298,15 @@ function Tilemap:changeTile(x, y, n)
     end
 end
 
+function Tilemap:getTile(x, y)
+    return self.tile_grid[x][y]
+end
+
 function Tilemap:removeTile(x, y)
     for i, tileset in ipairs(self.tilesets) do
-        self.spritebatches[i]:set(self.spritebatches_id_grid[i][x][y], 0, 0, 0, 0, 0)
-        self.spritebatches_id_grid[i][x][y] = 0
+        if self.spritebatches_id_grid[i][x][y] then
+            self.spritebatches[i]:set(self.spritebatches_id_grid[i][x][y], 0, 0, 0, 0, 0, 0)
+        end
     end
 end
 
