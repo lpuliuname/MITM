@@ -27,7 +27,7 @@ function Tilemap.new(x, y, tile_width, tile_height, tilesets, tile_grid, setting
     else self.tilesets = tilesets end
 
     -- 2D array containing tile data for the map, each element = a tile number
-    self.tile_grid = tile_grid 
+    self.tile_grid = self.area.fg.utils.table.copy(tile_grid)
 
     -- If input data is from a Tiled map...
     if type(tile_width) == 'string' then
@@ -305,6 +305,7 @@ end
 function Tilemap:removeTile(x, y)
     for i, tileset in ipairs(self.tilesets) do
         if self.spritebatches_id_grid[i][x][y] then
+            self.tile_grid[x][y] = 0
             self.spritebatches[i]:set(self.spritebatches_id_grid[i][x][y], 0, 0, 0, 0, 0, 0)
         end
     end
