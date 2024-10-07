@@ -280,21 +280,25 @@ function Tilemap:changeTile(x, y, n)
     -- then n is referring to the second tile of the second tileset, tileset_index holds the index (position
     -- in the tilesets list) for that second tileset)
     local tileset_index = 1
+    local sum = 0
+    local sum_pre = 0
     for i, x in ipairs(self.n_tiles_per_tileset) do
-        if n <= x then tileset_index = i; break end
+        sum = sum + x
+        if n <= sum then tileset_index = i; break end
+        sum_pre = sum_pre + x
     end
 
     -- Change the tile_grid and the relevant spritebatch
-    if not self.quads[tileset_index][n] then return end
+    if not self.quads[tileset_index][n - sum_pre] then return end
     if self.spritebatches_id_grid[tileset_index][x][y] then
         self.tile_grid[x][y] = n
         self.spritebatches[tileset_index]:set(self.spritebatches_id_grid[tileset_index][x][y], 
-                                             self.quads[tileset_index][n], self.tile_width*(y-1) + self.x, 
+                                             self.quads[tileset_index][n - sum_pre], self.tile_width*(y-1) + self.x, 
                                              self.tile_height*(x-1) + self.y, 0, 1, 1)
     else
         self.tile_grid[x][y] = n
         self.spritebatches_id_grid[tileset_index][x][y] = self.spritebatches[tileset_index]:add(
-        self.quads[tileset_index][n], self.tile_width*(y-1) + self.x, self.tile_height*(x-1) + self.y)
+        self.quads[tileset_index][n - sum_pre], self.tile_width*(y-1) + self.x, self.tile_height*(x-1) + self.y)
     end
 end
 
