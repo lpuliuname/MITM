@@ -39,8 +39,10 @@ end
 
 function Layer:resize(w, h)
     self.main_canvas = love.graphics.newCanvas(w, h)
+    self.main_canvas:setFilter('nearest', 'nearest')
     for _, name in ipairs(self.shader_names) do
         self.canvases[name] = love.graphics.newCanvas(w, h)
+        self.canvases[name]:setFilter('nearest', 'nearest')
     end
 end
 

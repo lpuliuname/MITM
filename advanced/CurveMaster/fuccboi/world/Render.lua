@@ -70,6 +70,8 @@ end
 
 function Render:renderResize(w, h)
     for _, layer in ipairs(self.layers) do layer:resize(w, h) end
+    self.main_canvas = love.graphics.newCanvas(w, h)
+    self.main_canvas:setFilter('nearest', 'nearest')
     self.camera:resize(w, h)
 end
 

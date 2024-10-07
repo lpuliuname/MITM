@@ -106,10 +106,20 @@ fg.setScreenSize = function(w, h)
 end
 
 fg.resize = function(w, h)
-    fg.screen_scale = math.min(w/fg.min_width, h/fg.min_height)
+    fg.screen_scale = math.max(w/fg.min_width, h/fg.min_height)
     fg.screen_width = w
     fg.screen_height = h
     fg.world:resize(w, h)
+end
+
+fg.zoomOut = function(dz)
+    fg.screen_scale = math.min(fg.screen_scale + dz, 4)
+    fg.world:resize(love.graphics.getWidth()*fg.screen_scale, love.graphics.getHeight()*fg.screen_scale) 
+end
+
+fg.zoomIn = function(dz)
+    fg.screen_scale = math.max(fg.screen_scale - dz, math.max((love.graphics.getWidth()/fg.min_width)/2, (love.graphics.getHeight()/fg.min_height)/2))
+    fg.world:resize(love.graphics.getWidth()*fg.screen_scale, love.graphics.getHeight()*fg.screen_scale) 
 end
 
 -- world
@@ -246,7 +256,7 @@ fg.run = function()
         -- Call update and draw
         accumulator = accumulator + dt
         while accumulator >= fixed_dt do
-            if love.update then love.update(fixed_dt); fg.input:update(dt) end
+            if love.update then love.update(fixed_dt); fg.input:update(dt); end
             accumulator = accumulator - fixed_dt
         end
 
