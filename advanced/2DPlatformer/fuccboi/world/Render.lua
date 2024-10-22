@@ -48,6 +48,18 @@ function Render:addToLayer(layer_name, object)
     if self.layers[layer_name] then self.layers[layer_name]:add(object) end
 end
 
+function Render:activateLayer(layer_name)
+    if self.layers[layer_name] then
+        self.layers[layer_name]:activate()
+    end
+end
+
+function Render:deactivateLayer(layer_name)
+    if self.layers[layer_name] then
+        self.layers[layer_name]:deactivate()
+    end
+end
+
 function Render:addShaderToLayer(layer_name, shader_name, shader_vertex_path, shader_fragment_path)
     self.layers[layer_name]:addShader(shader_name, shader_vertex_path, shader_fragment_path)
 end
@@ -94,9 +106,11 @@ function Render:renderDraw()
         -- Draw all layers
         local bx, by = self.camera:getPosition()
         for _, layer_name in ipairs(self.layers_order) do
-            self.camera.x = bx*self.layers[layer_name].parallax_scale
-            self.camera.y = by*self.layers[layer_name].parallax_scale
-            self.layers[layer_name]:draw()
+            if self.layers[layer_name].active then
+                self.camera.x = bx*self.layers[layer_name].parallax_scale
+                self.camera.y = by*self.layers[layer_name].parallax_scale
+                self.layers[layer_name]:draw()
+            end
         end
     end)
 

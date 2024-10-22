@@ -9,6 +9,8 @@ function Layer:new(world, name, settings)
     self.name = name
     self.entities = {}
 
+    self.active = true
+
     self.shader_names = {}
     self.shader_classes = {}
     self.shaders = {}
@@ -54,6 +56,14 @@ function Layer:remove(id)
     for i, entity in ipairs(self.entities) do
         if entity.id == id then table.remove(self.entities, i); return end
     end
+end
+
+function Layer:activate()
+    self.active = true
+end
+
+function Layer:deactivate()
+    self.active = false
 end
 
 function Layer:clear()
